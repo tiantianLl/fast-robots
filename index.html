@@ -94,10 +94,11 @@
                     <div class="portfolio-item mx-auto" data-bs-toggle="modal" data-bs-target="#portfolioModal2">
                         <div
                             class="portfolio-item-caption d-flex align-items-center justify-content-center h-100 w-100">
-                            <div class="portfolio-item-caption-content text-center text-white"><i
-                                    class="fas fa-plus fa-3x"></i></div>
+                            <div class="portfolio-item-caption-content text-center text-uppercase text-white"
+                                style='font-size:36px'>
+                                Bluetooth</div>
                         </div>
-                        <img class="img-fluid" src="assets/img/portfolio/cake.png" alt="..." />
+                        <img class="img-fluid" src="assets/img/portfolio/bluetooth.png" alt="..." />
                     </div>
                 </div>
                 <!-- Portfolio Item 3-->
@@ -105,10 +106,10 @@
                     <div class="portfolio-item mx-auto" data-bs-toggle="modal" data-bs-target="#portfolioModal3">
                         <div
                             class="portfolio-item-caption d-flex align-items-center justify-content-center h-100 w-100">
-                            <div class="portfolio-item-caption-content text-center text-white"><i
-                                    class="fas fa-plus fa-3x"></i></div>
+                            <div class="portfolio-item-caption-content text-center text-white" style='font-size:36px'>
+                                ToF</div>
                         </div>
-                        <img class="img-fluid" src="assets/img/portfolio/circus.png" alt="..." />
+                        <img class="img-fluid" src="assets/img/portfolio/tof.png" alt="..." />
                     </div>
                 </div>
                 <!-- Portfolio Item 4-->
@@ -458,20 +459,132 @@
                         <div class="row justify-content-center">
                             <div class="col-lg-8">
                                 <!-- Portfolio Modal - Title-->
-                                <h2 class="portfolio-modal-title text-secondary text-uppercase mb-0">Tasty Cake</h2>
+
+                                <h2 class="portfolio-modal-title text-secondary text-uppercase mb-0">Lab 2
+                                    <h1 class="text-warning" style='margin-top: .5rem'>Bluetooth</h1>
+                                </h2>
                                 <!-- Icon Divider-->
                                 <div class="divider-custom">
                                     <div class="divider-custom-line"></div>
                                     <div class="divider-custom-icon"><i class="fas fa-star"></i></div>
                                     <div class="divider-custom-line"></div>
                                 </div>
-                                <!-- Portfolio Modal - Image-->
-                                <img class="img-fluid rounded mb-5" src="assets/img/portfolio/cake.png" alt="..." />
+
                                 <!-- Portfolio Modal - Text-->
-                                <p class="mb-4">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia neque
-                                    assumenda ipsam nihil, molestias magnam, recusandae quos quis inventore quisquam
-                                    velit asperiores, vitae? Reprehenderit soluta, eos quod consequuntur itaque. Nam.
+                                <p align="left" class="mb-4 lead">In this lab we explore sending data between the
+                                    Artemis board and the computer via Bluetooth Low Energy, which is optimized for low
+                                    power use at low data rates. This communication framework will allow us to
+                                    effectively control and debug our robot in the future.</p>
+                                <h3 class="text-secondary">Setup</h3>
+                                <p align="left" class="mb-4 lead">
+                                    On the computer side, I follow these <a
+                                        href="https://cei-lab.github.io/FastRobots-2023/Lab2.html">detailed
+                                        instructions</a> provided by our awesome,
+                                    talented, passionate and inspiring course staff.
+                                    I installed Python 3.10.8, created a virtual environment, and configured required
+                                    packages. The main work on the computer side is done through Python code written in
+                                    Jupyter notebooks. <br>
+                                    On the Artemis side, Arduino is used to program the board and ArduinoBLE needs to be
+                                    installed from the library manager. <br></p>
+                                <p align="left" class="mb-4 lead">
+                                    Next I downloaded <a
+                                        href="https://cornell.box.com/s/aivj9ad3uv74lmpvxz8s64aamgz6azt1">this
+                                        codebase</a>, again provided by our wonderful, hard-working,
+                                    generous and dedicated teaching team. 😉 The codebase contains useful tools
+                                    including class definitions to simplify the transfer and manipulation of data, as
+                                    well as demos to get us started. <br>
+                                    The code that runs on Artemis sets up one service with three characteristics that
+                                    correspond to sending out floats, sending out strings, and receiving strings. While
+                                    a Bluetooth connection is established, the program will keep writing floats to the
+                                    “float characteristic”, which the computer can then read from. And the program also
+                                    responds to the commands it reads from the “receiving string characteristic”, which
+                                    is updated by the computer. <br>
+                                    On the computer side, we can use Python to send string commands to the Artemis
+                                    board, and receive data by either reading a characteristic or waiting for
+                                    notifications when a characteristic updates.</p>
+
+
+                                <p align="left" class="mb-4 lead">Once everything is ready, I load and burn the sketch
+                                    into the Artemis board. <code>BLE.address()</code> gives me the board’s MAC address
+                                    and I update this info on the computer side. I also generate a new BLEService UUID
+                                    and make sure the computer and Artemis agree.
+                                    <img class="img-fluid img-centered" src="assets/img/portfolio/MAC.png"
+                                        onClick="swap(this)" onmouseover="" style="cursor: pointer;">
                                 </p>
+
+                                <h3 class="text-secondary">ECHO</h3>
+                                <p align="left" class="mb-4 lead">The first task is to implement the <code>ECHO</code>
+                                    command which upon receiving a string from the computer, responds with an augmented
+                                    string containing the original string. I use the <code>EString</code> class to build
+                                    the augmented strings and <code>writeValue()</code> to send responses to the
+                                    computer. The result is shown in the screenshot below. On the left is the relevant
+                                    section of code running on Artemis. On the right is the Python code to send and
+                                    receive data. We can see that the computer sends “Hiiiii” and Artemis replies with
+                                    “Robot says -> Hiiiii:)”.
+                                    <img class="img-fluid img-centered" src="assets/img/portfolio/echo.png"
+                                        onClick="swap(this)" onmouseover="" style="cursor: pointer;">
+
+                                </p>
+
+                                <h3 class="text-secondary mt-4">GET_TIME_MILLIS and notification handler
+                                </h3>
+                                <p align="left" class="mb-4 lead">I add a new command that writes the string “T:123456”
+                                    to the string characteristic. On the Python side, I had to remember to modify
+                                    cmd_types.py to include the new command. This time, instead of calling
+                                    <code>receive_string()</code> to read the value, I set up a notification handler
+                                    with a callback function which extracts the time. The result is shown below.
+                                    “123456” is extracted and printed.
+
+
+                                    <img class="img-fluid img-centered" src="assets/img/portfolio/get_time.png"
+                                        onClick="swap(this)" onmouseover="" style="cursor: pointer;">
+                                </p>
+
+                                <h3 class="text-secondary">GET_TEMP_5s</h3>
+                                <p align="left" class="mb-4 lead">This task requires us to add a command to send five
+                                    timestamped temperature readings taken once per second. I structured my data in this
+                                    format: “| time, temp | time, temp …”. And I updated my callback function to extract
+                                    time and temperature. We can see the data printed in the bottom right corner of this
+                                    screenshot.
+                                    <img class="img-fluid img-centered" src="assets/img/portfolio/get_temp.png"
+                                        onClick="swap(this)" onmouseover="" style="cursor: pointer;">
+
+                                </p>
+
+
+
+                                <p align="left" class="mt-4 mb-4 lead">
+                                    To make sure my data will not exceed the characteristic size limit, I calculated my
+                                    maximum possible datasize. Temp has 3 decimal places and is unlikely to go below 0
+                                    or above 100 degree celsius so that gives 5 numbers + 1 decimal place = 6
+                                    characters. I also used <code>int</code> for <code>millis()</code> instead of
+                                    <code>unsigned long</code>. In total for each timestamped temperature there is 1 for
+                                    “|” + 6 for temp + 1 for “,” + 7 for time (which gives at least 2hr) = 15 bytes. So
+                                    my reply will have at most 5*15 = 75 bytes which is less than the characteristic
+                                    size limit of 150 bytes.
+                                </p>
+
+                                <h3 class="text-secondary">GET_TEMP_5s_RAPID</h3>
+                                <p align="left" class="mb-4 lead">For this task, we are rapidly sending timestamped
+                                    temperatures for five seconds. I check the data size and send data out when it’s
+                                    about to reach the characteristic size limit. The code and demonstration is shown in
+                                    this video. On average I was able to send 2100 temperature points.</p>
+                                <iframe width="560" height="315" src="https://www.youtube.com/embed/AM_SCGbl3JI"
+                                    title="YouTube video player" frameborder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                    allowfullscreen></iframe>
+
+                                <h3 class="text-secondary mt-4">RAM Limit</h3>
+                                <p align="left" class="mb-4 lead">Theoretically with 384 kB of RAM, the Artemis can
+                                    store 5 minutes of 32-bit data taken at 320 Hz. (300s * 4 bytes/value * 320
+                                    values/sec = 384kB)
+                                    However, there are also global variables. When Artemis is doing some computations
+                                    some other local variables are probably needed. Therefore, the actual capacity for
+                                    storing data is probably less.
+                                </p>
+
+
+
                                 <button class="btn btn-primary" data-bs-dismiss="modal">
                                     <i class="fas fa-xmark fa-fw"></i>
                                     Close Window
@@ -495,7 +608,9 @@
                         <div class="row justify-content-center">
                             <div class="col-lg-8">
                                 <!-- Portfolio Modal - Title-->
-                                <h2 class="portfolio-modal-title text-secondary text-uppercase mb-0">Circus Tent</h2>
+                                <h2 class="portfolio-modal-title text-secondary text-uppercase mb-0">Lab 3
+                                    <h1 class="text-warning" style='margin-top: .5rem'>Time of Flight Sensors</h1>
+                                </h2>
                                 <!-- Icon Divider-->
                                 <div class="divider-custom">
                                     <div class="divider-custom-line"></div>
@@ -503,12 +618,144 @@
                                     <div class="divider-custom-line"></div>
                                 </div>
                                 <!-- Portfolio Modal - Image-->
-                                <img class="img-fluid rounded mb-5" src="assets/img/portfolio/circus.png" alt="..." />
+                                <!-- <img class="img-fluid rounded mb-5" src="assets/img/portfolio/cabin.png" alt="..." /> -->
                                 <!-- Portfolio Modal - Text-->
-                                <p class="mb-4">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia neque
-                                    assumenda ipsam nihil, molestias magnam, recusandae quos quis inventore quisquam
-                                    velit asperiores, vitae? Reprehenderit soluta, eos quod consequuntur itaque. Nam.
+                                <p align="left" class="mb-4 lead">We played around with Time of Flight Sensors (ToF) in
+                                    this lab.
                                 </p>
+                                <h3 class="text-secondary">Setup</h3>
+                                <p align="left" class=" lead">
+                                    The two VL53L1X sensors have the same default I2C address. In order to address them
+                                    individually, we can either
+                                    <li align="left" class="mb-2 lead">Change the address programmatically by first
+                                        turning off one sensor and changing the address of the other sensor. This method
+                                        allows us to simultaneously get data from both sensors. However we will need to
+                                        change the address every time the sensor restarts since the default address is
+                                        hardwired and will reset itself.</li>
+                                    <li align="left" class="mb-2 lead">Interleave two sensors by using their shutdown
+                                        pins, turning the sensors on at different times. Doing so requires extra control
+                                        logic and can lead to downtimes when sensors are turning on and off.</li>
+                                </p>
+                                <p align="left" class="mb-4 lead">
+                                    I chose the first method.
+                                </p>
+                                <p align="left" class="mb-4 lead">I planned to put one ToF in front of the car and the
+                                    other at the back, thinking that after the car flipped 180 in the air during a
+                                    stunt, it can still go forward. Also rotating 180 can map the surroundings. However,
+                                    if there are obstacles to the sides of the car, it will not be able to detect them.
+                                    Here is a photo showing the connections.
+                                    <img class="img-fluid img-centered" src="assets/img/portfolio/tof-connect.png"
+                                        onClick="swap(this)" onmouseover="" style="cursor: pointer;">
+                                </p>
+
+                                <h3 class="text-secondary">I2C</h3>
+                                <p align="left" class="mb-4 lead">
+                                    Scan the I2C channel to find the sensor:
+                                    <img class="img-fluid img-centered" src="assets/img/portfolio/i2c.png"
+                                        onClick="swap(this)" onmouseover="" style="cursor: pointer;">
+                                    We can see the address is 0x29. This is because the original 0x52 address contains a
+                                    LSBit for read write
+                                    status as shown in the datasheet.
+                                    <img class="img-fluid img-centered" src="assets/img/portfolio/i2caddr.png"
+                                        onClick="swap(this)" onmouseover="" style="cursor: pointer;">
+                                </p>
+
+
+                                <h3 class="text-secondary mt-4">Distance Modes</h3>
+                                <p align="left" class="mb-4 lead">
+
+
+                                    <img class="img-fluid img-centered" src="assets/img/portfolio/dist-mode.png"
+                                        onClick="swap(this)" onmouseover="" style="cursor: pointer;">
+                                    The sensor has three distance modes (actually our library only supports long and
+                                    short). <br>
+                                    The Long mode has the longest range but is impacted significantly by ambient light
+                                    while Short mode is more robust to lighting conditions. I want to go with the Short
+                                    mode for the robot since I don’t expect it to navigate long distances and I want it
+                                    to be more reliable.
+
+                                </p>
+
+                                <p align="left" class="mb-4 lead">I perform tests to see if the measured distance of the
+                                    sensor is aligned with the actual distance.</p>
+                                <div class="row">
+                                    <div class="col">
+                                        <img class="img-fluid" src="assets/img/portfolio/tof-setup.png"
+                                            onClick="swap(this)" onmouseover="" style="cursor: pointer;width:150%">
+                                    </div>
+                                    <div class="col">
+                                        <img class="img-fluid" src="assets/img/portfolio/tof-setup2.png"
+                                            onClick="swap(this)" onmouseover="" style="cursor: pointer;width:60%">
+                                    </div>
+                                </div>
+                                <p align="left" class="mb-4 lead">
+                                    I plotted the resulting data from 3 repeated measurements of a range of 200 mm at 20
+                                    mm increments. We can see that the range is about 1400 mm. Going over 1500 mm we see
+                                    some weird data. The accuracy is pretty good. The graph is close to y=x when target
+                                    is in range. Repeatability is also good. The maximum difference between repeated
+                                    measurements is negligible.<br>
+
+
+                                    <img class="img-fluid img-centered" src="assets/img/portfolio/tof_doc.png"
+                                        onClick="swap(this)" onmouseover="" style="cursor: pointer;"><br>
+
+                                    For ranging time, the sensor takes 51 ms from <code>startRanging()</code> to
+                                    <code>stopRanging()</code> while in range , and 31 ms when out of range. The time
+                                    also slightly increases (51->52) while the object is closer.
+
+
+                                </p>
+
+                                <h3 class="text-secondary">Two Sensors</h3>
+                                <p align="left" class="mb-4 lead">
+                                    I soldered the <code>XSHUT</code> pin of one ToF sensor to pin A3 of the Artemis
+                                    board. To turn the sensor off, I pull the pin low.</p>
+
+                                <img class="img-fluid img-centered" src="assets/img/portfolio/2tof-code.png"
+                                    onClick="swap(this)" onmouseover="" style="cursor: pointer;">
+                                <p align="left" class="mb-4 mt-4 lead">
+                                    After changing one sensor's address, I was able to get data from both sensors
+                                    simultaneously.</p>
+
+                                <img class="img-fluid img-centered" src="assets/img/portfolio/2tof.png"
+                                    onClick="swap(this)" onmouseover="" style="cursor: pointer;"><br>
+
+
+
+
+                                <h3 class="text-secondary mt-4">Speed</h3>
+                                <p align="left" class="mb-4 lead">
+                                    Using default mode, time between measurements is 202 ms.
+                                    With short mode, it reduces to 62 ms. Here is a demo: </p>
+                                <iframe width="560" height="315" src="https://www.youtube.com/embed/3z6ZIap86PY"
+                                    title="YouTube video player" frameborder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                    allowfullscreen></iframe>
+                                <p align="left" class="mb-4 lead">
+                                    Also if the measured distance is longer, the time also increases.
+                                    Reading the datasheet, I found that changing the timing budget to 20 ms in Short
+                                    mode can reduce the time needed by the sensor to perform and report ranging
+                                    measurements data.
+
+                                </p>
+
+                                <p align="left" class="mt-4 mb-4 lead">
+                                </p>
+
+                                <h3 class="text-secondary">Bluetooth</h3>
+                                <p align="left" class="mb-4 lead">
+                                    Building off of the previous Bluetooth lab, I added a command to get ToF data for a
+                                    user-specified period of time. The results are then plotted.
+                                </p>
+                                <iframe class="mb-4" width="560" height="315"
+                                    src="https://www.youtube.com/embed/IWx7_FqTEVU" title="YouTube video player"
+                                    frameborder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                    allowfullscreen></iframe>
+
+
+
+
                                 <button class="btn btn-primary" data-bs-dismiss="modal">
                                     <i class="fas fa-xmark fa-fw"></i>
                                     Close Window
@@ -532,7 +779,9 @@
                         <div class="row justify-content-center">
                             <div class="col-lg-8">
                                 <!-- Portfolio Modal - Title-->
-                                <h2 class="portfolio-modal-title text-secondary text-uppercase mb-0">Controller</h2>
+                                <h2 class="portfolio-modal-title text-secondary text-uppercase mb-0">Lab 3
+                                    <h1 class="text-warning" style='margin-top: .5rem'>Time of Flight Sensors</h1>
+                                </h2>
                                 <!-- Icon Divider-->
                                 <div class="divider-custom">
                                     <div class="divider-custom-line"></div>
@@ -540,11 +789,35 @@
                                     <div class="divider-custom-line"></div>
                                 </div>
                                 <!-- Portfolio Modal - Image-->
-                                <img class="img-fluid rounded mb-5" src="assets/img/portfolio/game.png" alt="..." />
+                                <!-- <img class="img-fluid rounded mb-5" src="assets/img/portfolio/cabin.png" alt="..." /> -->
                                 <!-- Portfolio Modal - Text-->
-                                <p class="mb-4">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia neque
-                                    assumenda ipsam nihil, molestias magnam, recusandae quos quis inventore quisquam
-                                    velit asperiores, vitae? Reprehenderit soluta, eos quod consequuntur itaque. Nam.
+                                <p align="left" class="mb-4 lead">
+
+                                </p>
+                                <h3 class="text-secondary">Setup</h3>
+                                <p align="left" class="mb-4 lead">
+
+                                </p>
+
+                                <h3 class="text-secondary">Example: Blink</h3>
+                                <p align="left" class="mb-4 lead">
+                                </p>
+                                <iframe width="560" height="315" src="https://www.youtube.com/embed/rHggYrlvzK8"
+                                    title="YouTube video player" frameborder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                    allowfullscreen></iframe>
+
+                                <h3 class="text-secondary mt-4">Example: Serial</h3>
+                                <p align="left" class="mb-4 lead">
+
+                                    <img class="img-fluid img-centered" src="assets/img/portfolio/serial.png"
+                                        onClick="swap(this)" onmouseover="" style="cursor: pointer;">
+                                </p>
+
+                                <h3 class="text-secondary">Example: Analog Read</h3>
+                                <p align="left" class="mb-4 lead"></p>
+
+                                <p align="left" class="mt-4 mb-4 lead">
                                 </p>
                                 <button class="btn btn-primary" data-bs-dismiss="modal">
                                     <i class="fas fa-xmark fa-fw"></i>
@@ -569,7 +842,9 @@
                         <div class="row justify-content-center">
                             <div class="col-lg-8">
                                 <!-- Portfolio Modal - Title-->
-                                <h2 class="portfolio-modal-title text-secondary text-uppercase mb-0">Locked Safe</h2>
+                                <h2 class="portfolio-modal-title text-secondary text-uppercase mb-0">Lab 3
+                                    <h1 class="text-warning" style='margin-top: .5rem'>Time of Flight Sensors</h1>
+                                </h2>
                                 <!-- Icon Divider-->
                                 <div class="divider-custom">
                                     <div class="divider-custom-line"></div>
@@ -577,11 +852,35 @@
                                     <div class="divider-custom-line"></div>
                                 </div>
                                 <!-- Portfolio Modal - Image-->
-                                <img class="img-fluid rounded mb-5" src="assets/img/portfolio/safe.png" alt="..." />
+                                <!-- <img class="img-fluid rounded mb-5" src="assets/img/portfolio/cabin.png" alt="..." /> -->
                                 <!-- Portfolio Modal - Text-->
-                                <p class="mb-4">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia neque
-                                    assumenda ipsam nihil, molestias magnam, recusandae quos quis inventore quisquam
-                                    velit asperiores, vitae? Reprehenderit soluta, eos quod consequuntur itaque. Nam.
+                                <p align="left" class="mb-4 lead">
+
+                                </p>
+                                <h3 class="text-secondary">Setup</h3>
+                                <p align="left" class="mb-4 lead">
+
+                                </p>
+
+                                <h3 class="text-secondary">Example: Blink</h3>
+                                <p align="left" class="mb-4 lead">
+                                </p>
+                                <iframe width="560" height="315" src="https://www.youtube.com/embed/rHggYrlvzK8"
+                                    title="YouTube video player" frameborder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                    allowfullscreen></iframe>
+
+                                <h3 class="text-secondary mt-4">Example: Serial</h3>
+                                <p align="left" class="mb-4 lead">
+
+                                    <img class="img-fluid img-centered" src="assets/img/portfolio/serial.png"
+                                        onClick="swap(this)" onmouseover="" style="cursor: pointer;">
+                                </p>
+
+                                <h3 class="text-secondary">Example: Analog Read</h3>
+                                <p align="left" class="mb-4 lead"></p>
+
+                                <p align="left" class="mt-4 mb-4 lead">
                                 </p>
                                 <button class="btn btn-primary" data-bs-dismiss="modal">
                                     <i class="fas fa-xmark fa-fw"></i>
@@ -606,7 +905,9 @@
                         <div class="row justify-content-center">
                             <div class="col-lg-8">
                                 <!-- Portfolio Modal - Title-->
-                                <h2 class="portfolio-modal-title text-secondary text-uppercase mb-0">Submarine</h2>
+                                <h2 class="portfolio-modal-title text-secondary text-uppercase mb-0">Lab 3
+                                    <h1 class="text-warning" style='margin-top: .5rem'>Time of Flight Sensors</h1>
+                                </h2>
                                 <!-- Icon Divider-->
                                 <div class="divider-custom">
                                     <div class="divider-custom-line"></div>
@@ -614,12 +915,35 @@
                                     <div class="divider-custom-line"></div>
                                 </div>
                                 <!-- Portfolio Modal - Image-->
-                                <img class="img-fluid rounded mb-5" src="assets/img/portfolio/submarine.png"
-                                    alt="..." />
+                                <!-- <img class="img-fluid rounded mb-5" src="assets/img/portfolio/cabin.png" alt="..." /> -->
                                 <!-- Portfolio Modal - Text-->
-                                <p class="mb-4">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia neque
-                                    assumenda ipsam nihil, molestias magnam, recusandae quos quis inventore quisquam
-                                    velit asperiores, vitae? Reprehenderit soluta, eos quod consequuntur itaque. Nam.
+                                <p align="left" class="mb-4 lead">
+
+                                </p>
+                                <h3 class="text-secondary">Setup</h3>
+                                <p align="left" class="mb-4 lead">
+
+                                </p>
+
+                                <h3 class="text-secondary">Example: Blink</h3>
+                                <p align="left" class="mb-4 lead">
+                                </p>
+                                <iframe width="560" height="315" src="https://www.youtube.com/embed/rHggYrlvzK8"
+                                    title="YouTube video player" frameborder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                    allowfullscreen></iframe>
+
+                                <h3 class="text-secondary mt-4">Example: Serial</h3>
+                                <p align="left" class="mb-4 lead">
+
+                                    <img class="img-fluid img-centered" src="assets/img/portfolio/serial.png"
+                                        onClick="swap(this)" onmouseover="" style="cursor: pointer;">
+                                </p>
+
+                                <h3 class="text-secondary">Example: Analog Read</h3>
+                                <p align="left" class="mb-4 lead"></p>
+
+                                <p align="left" class="mt-4 mb-4 lead">
                                 </p>
                                 <button class="btn btn-primary" data-bs-dismiss="modal">
                                     <i class="fas fa-xmark fa-fw"></i>
