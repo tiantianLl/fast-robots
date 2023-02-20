@@ -113,12 +113,12 @@
                     </div>
                 </div>
                 <!-- Portfolio Item 4-->
-                <div class="col-md-6 col-lg-4 mb-5 mb-lg-0">
+                <div class="col-md-6 col-lg-4 mb-5">
                     <div class="portfolio-item mx-auto" data-bs-toggle="modal" data-bs-target="#portfolioModal4">
                         <div
                             class="portfolio-item-caption d-flex align-items-center justify-content-center h-100 w-100">
-                            <div class="portfolio-item-caption-content text-center text-white"><i
-                                    class="fas fa-plus fa-3x"></i></div>
+                            <div class="portfolio-item-caption-content text-center text-white" style='font-size:36px'>
+                                IMU</div>
                         </div>
                         <img class="img-fluid" src="assets/img/portfolio/game.png" alt="..." />
                     </div>
@@ -779,8 +779,8 @@
                         <div class="row justify-content-center">
                             <div class="col-lg-8">
                                 <!-- Portfolio Modal - Title-->
-                                <h2 class="portfolio-modal-title text-secondary text-uppercase mb-0">Lab 3
-                                    <h1 class="text-warning" style='margin-top: .5rem'>Time of Flight Sensors</h1>
+                                <h2 class="portfolio-modal-title text-secondary text-uppercase mb-0">Lab 4
+                                    <h1 class="text-warning" style='margin-top: .5rem'>Inertial Measurement Unit</h1>
                                 </h2>
                                 <!-- Icon Divider-->
                                 <div class="divider-custom">
@@ -792,33 +792,192 @@
                                 <!-- <img class="img-fluid rounded mb-5" src="assets/img/portfolio/cabin.png" alt="..." /> -->
                                 <!-- Portfolio Modal - Text-->
                                 <p align="left" class="mb-4 lead">
-
+                                    In this lab we finally got our car and get to run stunts! We added the Inertial
+                                    Measurement Unit (IMU) to the car and used sensor fusion to calculate pitch and row
+                                    from raw data.
                                 </p>
                                 <h3 class="text-secondary">Setup</h3>
                                 <p align="left" class="mb-4 lead">
+                                    Just like what we did for the ToF sensor, I installed SparkFun 9DOF IMU Breakout -
+                                    ICM 20948 - Arduino Library. I started exploring using the basic example. <br>
+
+                                    In the code, <code>AD0_VAL</code> is defined to be 1. From reading the datasheet, I
+                                    found out that this is the LSB bit of the I2C address. The default is 1 and if we
+                                    short the ADR pads on the IMU board, the value becomes 0. This can be used to
+                                    connect two IMUs to the same I2C bus (leaving one default and short the other so
+                                    they have different address). I wish our ToF sensors have this functionality. <br>
+
+                                    I played around and examine the acceleration and gyroscope data as I move the IMU
+                                    board according to the axis drawn on it. When the board is still, the acceleration
+                                    along x and y axis are 0 as expected, but the acceleration along z axis is equal to
+                                    the gravitational acceleration because we are on earth. When rotating and flipping
+                                    the board, I notice that the accelerometer data changes shaper than the gyroscope
+                                    data. <br>
+
+                                    I added code to blink the LED when IMU finished setting up. This will be helpful
+                                    when debugging later.
 
                                 </p>
 
-                                <h3 class="text-secondary">Example: Blink</h3>
+                                <h3 class="text-secondary">Accelerometer</h3>
                                 <p align="left" class="mb-4 lead">
+                                    I calculated the pitch and roll from accelerometer data.<br>
+
                                 </p>
-                                <iframe width="560" height="315" src="https://www.youtube.com/embed/rHggYrlvzK8"
+                                <script
+                                    src="https://gist.github.com/tiantianLl/018f53fccf503a8dd1b2284f6b1bbb19.js"></script>
+                                <p align="left" class="mb-4 lead">
+                                    Here is a demo showing outputs at {-90, 0, 90} degrees pitch and roll:</p>
+                                <iframe width="560" height="315" src="https://www.youtube.com/embed/V2Xv-h9ymNs"
                                     title="YouTube video player" frameborder="0"
                                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                                     allowfullscreen></iframe>
 
-                                <h3 class="text-secondary mt-4">Example: Serial</h3>
+                                <p align="left" class="mb-4 lead">The sensor is pretty accurate. The error is within 2
+                                    degree.</p>
+
+                                <p align="left" class="mb-4 lead"> To reduce the effect of noise, I analyze the data in
+                                    frequency domain.
+                                    I used <code>scipy.fftpack.fft</code> to implement Fast Fourier Tranform. Here is
+                                    the result I got with 400 samples and sample rate = 30 Hz.
+                                </p>
+                                <img class="img-fluid img-centered" src="assets/img/portfolio/rpfft.png"
+                                    onClick="swap(this)" onmouseover="" style="cursor: pointer;">
+
+                                <p align="left" class="mb-4 lead">As we can see, apart from the spick around 0Hz, these
+                                    is little noise.
+                                    I set up low pass filter for accelerometer and gyroscope according to the datasheet.
+                                </p>
+                                <img class="img-fluid img-centered" src="assets/img/portfolio/acclpf.png"
+                                    onClick="swap(this)" onmouseover="" style="cursor: pointer;">
+                                <script
+                                    src="https://gist.github.com/tiantianLl/2a2f794fc6366bd38f354a72f7da6b60.js"></script>
+                                <p align="left" class="mb-4 lead">For comparison, the figure on the left is raw data and
+                                    the one on the
+                                    right is data with low pass filter applied.</p>
+
+                                <div class="row">
+                                    <div class="col">
+                                        <img class="img-fluid" src="assets/img/portfolio/pr-nolpf.png"
+                                            onClick="swap(this)" onmouseover="" style="cursor: pointer;width:150%">
+                                    </div>
+                                    <div class="col">
+                                        <img class="img-fluid" src="assets/img/portfolio/pr-lpf.png"
+                                            onClick="swap(this)" onmouseover="" style="cursor: pointer;width:150%">
+                                    </div>
+                                </div>
+
+                                <h3 class="text-secondary mt-4">Gyroscope</h3>
                                 <p align="left" class="mb-4 lead">
-
-                                    <img class="img-fluid img-centered" src="assets/img/portfolio/serial.png"
-                                        onClick="swap(this)" onmouseover="" style="cursor: pointer;">
+                                    I computed pitch, roll and yaw from readings from gyroscope.
                                 </p>
+                                <script
+                                    src="https://gist.github.com/tiantianLl/7029414ba389f765cbf12d24898d311f.js"></script>
+                                <p align="left" class="mb-4 lead">
+                                    This video shows the output comparing to that given by the accelerometer at
+                                    different sampling rate. We can see
+                                    that gyroscope’s output suffers from drifting. And increasing the samping frequency
+                                    improves the accuracy of my estimated angles.</p>
 
-                                <h3 class="text-secondary">Example: Analog Read</h3>
-                                <p align="left" class="mb-4 lead"></p>
+                                <iframe width="560" height="315" src="https://www.youtube.com/embed/AWrpPFxC9WE"
+                                    title="YouTube video player" frameborder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                    allowfullscreen></iframe>
 
+
+                                <p align="left" class="mt-4 mb-4 lead">Accelerometer is especially noisy near noise such
+                                    as
+                                    our DC motor for the car. However, it does not have any measurement bias since
+                                    gravity always points down.
+                                    Gyroscope, on the other hand, has much less noise. But by using dead reckoning and
+                                    integrating the gyro data to get an estimate for angle, a large bias is
+                                    introduced <a
+                                        href=https://vanhunteradams.com/Pico/ReactionWheel/Complementary_Filters.html>[Hunter's
+                                        tutorial on Complementary
+                                        Filter]</a>.
+
+                                    To get the best of both worlds, I used a complimentary filter to compute an accurate
+                                    and stable estimate of pitch and roll. The results can be seen in the video.
+                                </p>
+                                <script
+                                    src="https://gist.github.com/tiantianLl/d3c4a742f220e37e9ab052ce96fff009.js"></script>
+
+
+                                <iframe width="560" height="315" src="https://www.youtube.com/embed/tFsWjgNpt1U"
+                                    title="YouTube video player" frameborder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                    allowfullscreen></iframe>
+
+
+                                <h3 class="text-secondary mt-4">Sample Data</h3>
+                                <p align="left" class="mb-4 lead">After getting rid of all the delays and Serial.print()
+                                    statements, I was able to sample IMU data every 2-4 ms. This screenshot shows the
+                                    timestamped IMU data I collected.</p>
+
+                                <img class="img-fluid img-centered" src="assets/img/portfolio/imu.png"
+                                    onClick="swap(this)" onmouseover="" style="cursor: pointer;">
                                 <p align="left" class="mt-4 mb-4 lead">
+                                    To get both ToF and IMU data, I decided to store them in different arrays for the
+                                    ease of data processing. And I included 2 timestamps for ToF and 1 for IMU. ToF is
+                                    also much slower than IMU. When we map out the room later, we might want to know the
+                                    angle/yaw from IMU and the distance from ToF at the same time.
+                                    Initially, I checked if ToF data is ready first, but only collected 3 ToF data in
+                                    5s. So I check if IMU is ready first. That way ToF have time for ranging and I was
+                                    able to collect more ToF data. Here is a demo collecting and plotting 5 seconds of
+                                    ToF and IMU data.
+
                                 </p>
+                                <iframe width="560" height="315" src="https://www.youtube.com/embed/VCX7XliTOuI"
+                                    title="YouTube video player" frameborder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                    allowfullscreen></iframe>
+                                <p align="left" class="mt-4 mb-4 lead">
+                                    Considering the memory of the Artemis, ideally I can store almost 50 seconds of ToF
+                                    and IMU data in their arrays. Here is the calculation:<br>
+                                    Int takes 2 bytes while floats takes 4 bytes.<br>
+                                    ToF has 2 timestamps and 2 distances of type int: 2*2 + 2*2 = 8 bytes per sample.
+                                    There are 1/0.062 = 16 samples per second. That gives us 8*16 = 128 bytes/s.<br>
+                                    IMU has 1 int timestamp and 3 floats for pitch, roll, and yaw: 1*2 + 3*4 = 14 bytes
+                                    per sample. And there are 1/0.002 = 500 samples per second so 14*500 = 7000
+                                    bytes/s.<br>
+                                    Artemis has 384 kB of RAM. 384000 / 7128 = 53.9 seconds.</p>
+
+                                <h3 class="text-secondary mt-4">Stunt!</h3>
+                                <p align="left" class="mb-4 lead"> We use separate batteries to power the digital
+                                    electronics and the motors so the sensitive sensors will not get disturbed from the
+                                    noisy motors.<br>
+                                    The 3.7V 650mAh battery is used to power the digital electronics and the 3.7V 850mAh
+                                    one is powering the motors through the motor driver because the motors draws
+                                    significant more amount of current.
+                                </p>
+                                <p align="left" class="mb-4 lead">
+                                    I was able to flip the car by driving forward and then quickly drive backward. The
+                                    car can sometimes flip on its sides too. Here is a demo of the car’s stunts.
+                                </p>
+                                <iframe width="560" height="315" src="https://www.youtube.com/embed/Da66CLrvmAQ"
+                                    title="YouTube video player" frameborder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                    allowfullscreen></iframe>
+                                <p align="left" class="mb-4 lead">
+                                    I taped the circuits on the the car and recorded data while the car is performing a
+                                    stunt. Here is the stunt and the ToF and IMU data collected during the stunt.</p>
+                                <iframe width="560" height="315" src="https://www.youtube.com/embed/Qrxd4vL1ixA"
+                                    title="YouTube video player" frameborder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                    allowfullscreen></iframe>
+
+                                <img class="img-fluid img-centered" src="assets/img/portfolio/last_run.png"
+                                    onClick="swap(this)" onmouseover="" style="cursor: pointer;">
+
+                                <img class="img-fluid img-centered mb-4" src="assets/img/portfolio/lat_run_rp.png"
+                                    onClick="swap(this)" onmouseover="" style="cursor: pointer;">
+
+
+
+
+
+
+
                                 <button class="btn btn-primary" data-bs-dismiss="modal">
                                     <i class="fas fa-xmark fa-fw"></i>
                                     Close Window
