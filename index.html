@@ -128,10 +128,10 @@
                     <div class="portfolio-item mx-auto" data-bs-toggle="modal" data-bs-target="#portfolioModal5">
                         <div
                             class="portfolio-item-caption d-flex align-items-center justify-content-center h-100 w-100">
-                            <div class="portfolio-item-caption-content text-center text-white"><i
-                                    class="fas fa-plus fa-3x"></i></div>
+                            <div class="portfolio-item-caption-content text-center text-white" style='font-size:36px'>
+                                MOTORS</div>
                         </div>
-                        <img class="img-fluid" src="assets/img/portfolio/safe.png" alt="..." />
+                        <img class="img-fluid" src="assets/img/portfolio/wheeloc.jpg" alt="..." />
                     </div>
                 </div>
                 <!-- Portfolio Item 6-->
@@ -1001,8 +1001,8 @@
                         <div class="row justify-content-center">
                             <div class="col-lg-8">
                                 <!-- Portfolio Modal - Title-->
-                                <h2 class="portfolio-modal-title text-secondary text-uppercase mb-0">Lab 3
-                                    <h1 class="text-warning" style='margin-top: .5rem'>Time of Flight Sensors</h1>
+                                <h2 class="portfolio-modal-title text-secondary text-uppercase mb-0">Lab 5
+                                    <h1 class="text-warning" style='margin-top: .5rem'>Motors and Open Loop Control</h1>
                                 </h2>
                                 <!-- Icon Divider-->
                                 <div class="divider-custom">
@@ -1014,33 +1014,106 @@
                                 <!-- <img class="img-fluid rounded mb-5" src="assets/img/portfolio/cabin.png" alt="..." /> -->
                                 <!-- Portfolio Modal - Text-->
                                 <p align="left" class="mb-4 lead">
+                                    In this lab we fully integrated the robot with Artemis, sensors, motor drivers, and
+                                    batteries. I calibrated the motors so the car moves in a straight line and was able
+                                    to perform open loop control.
 
                                 </p>
-                                <h3 class="text-secondary">Setup</h3>
+
+                                <h3 class="text-secondary">Motor Driver</h3>
                                 <p align="left" class="mb-4 lead">
+                                    I need to hook up the two motor drivers to Artemis. After reading the datasheet, I
+                                    decided to use pin 6,7 and 11,12 since they support pulse width modulated(PWM)
+                                    signals. <br>
+                                    At first, I connected the signal of one motor driver and powered it from an external
+                                    power supply. I chose 3V and a 2A current limit for the power supply since our
+                                    battery is going to supply 3V and the peak output current per channel of the motor
+                                    driver is 2A. <br>
+                                    I then generated PWM signals with <code>analogWrite()</code> and checked the motor
+                                    driver output on an oscilloscope.
 
                                 </p>
-
-                                <h3 class="text-secondary">Example: Blink</h3>
+                                <div class="row mb-4">
+                                    <div class="col">
+                                        <img class="img-fluid" src="assets/img/portfolio/pwmf.jpg" onClick="swap(this)"
+                                            onmouseover="" style="cursor: pointer;width:100%">
+                                    </div>
+                                    <div class="col">
+                                        <img class="img-fluid" src="assets/img/portfolio/pwmb.jpg" onClick="swap(this)"
+                                            onmouseover="" style="cursor: pointer;height:6.83cm">
+                                    </div>
+                                </div>
                                 <p align="left" class="mb-4 lead">
+                                    I connected the motor to the driver and ran the wheels in both directions. A demo is
+                                    shown in this video.
+
                                 </p>
-                                <iframe width="560" height="315" src="https://www.youtube.com/embed/rHggYrlvzK8"
+                                <iframe width="560" height="315" src="https://www.youtube.com/embed/2YyJIHQRrMI"
+                                    title="YouTube video player" frameborder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                    allowfullscreen></iframe>
+                                <p align="left" class="mb-4 mt-4 lead">
+                                    Next I connected the battery to the motor driver. We use separate batteries to power
+                                    the digital electronics and the motors so the sensitive sensors will not get
+                                    disturbed from the noisy motors.
+                                    The 3.7V 650mAh battery is used to power the digital electronics and the 3.7V 850mAh
+                                    one is powering the motors through the motor driver because the motors draw
+                                    significant more amount of current.</p>
+                                <p align="left" class="mb-4 mt-4 lead">
+
+                                    After making sure everything works as
+                                    expected,
+                                    I hooked up the whole circuitry. A thing to note is that in the datasheet it says
+                                    the control source and the motor driver must share a common ground. So I shorted the
+                                    two GND pins on the motor driver, one connected to battery ground and the other to
+                                    Artemis ground.
+                                    The final integrated car looks like this:</p>
+
+
+
+                                <img class="img-fluid img-centered mb-4" src="assets/img/portfolio/integrate.jpg"
+                                    onClick="swap(this)" onmouseover="" style="cursor: pointer;width: 50%;">
+
+                                <h3 class="text-secondary">Tests</h3>
+                                <p align="left" class="mb-4 lead">
+                                    I try to find out the lower PWM limit for which the robot starts to move forward and
+                                    on-axis turns while on the ground. By slowly increasing the PWM value I found out a
+                                    minimum of <code>40</code> is required to get the car to move and <code>100</code>
+                                    for the car to perform an
+                                    on-axis turn while on full battery power. Here is a demo.
+                                </p>
+                                <iframe width="560" height="315" src="https://www.youtube.com/embed/6Vj1nJpGTRo"
+                                    title="YouTube video player" frameborder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                    allowfullscreen></iframe>
+                                <p align="left" class="mb-4 mt-4 lead">
+                                    I also test to see if my car can move in a straight line. I found that it drives off
+                                    to
+                                    the left. So I added in a calibration factor to reduce the power of the right motor.
+                                    In
+                                    the end the robot is able to follow a straight line for at least 6 feet.
+                                </p>
+                                <script
+                                    src="https://gist.github.com/tiantianLl/e1838cfde3bdfe0df6cff0e3f033bd7e.js"></script>
+                                <iframe width="560" height="315" src="https://www.youtube.com/embed/1stZZPaKEwk"
                                     title="YouTube video player" frameborder="0"
                                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                                     allowfullscreen></iframe>
 
-                                <h3 class="text-secondary mt-4">Example: Serial</h3>
-                                <p align="left" class="mb-4 lead">
-
-                                    <img class="img-fluid img-centered" src="assets/img/portfolio/serial.png"
-                                        onClick="swap(this)" onmouseover="" style="cursor: pointer;">
+                                <p align="left" class="mb-4 mt-4 lead">
+                                    Here is a demo of untethered, open-loop control. I was trying to make the car flip
+                                    by
+                                    first moving forward and then moving back suddenly. But the car doesn’t change
+                                    direction
+                                    quick enough to do that.
                                 </p>
+                                <iframe width="513" height="500" src="https://www.youtube.com/embed/mAJfTZABBLk"
+                                    title="Lab5.4 Motors Open Loop Control" frameborder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                    allowfullscreen></iframe>
+                                <script class="mb-4 mt-4"
+                                    src="https://gist.github.com/tiantianLl/88e0711708fe14082d75d464a0fcac1e.js"></script>
 
-                                <h3 class="text-secondary">Example: Analog Read</h3>
-                                <p align="left" class="mb-4 lead"></p>
-
-                                <p align="left" class="mt-4 mb-4 lead">
-                                </p>
                                 <button class="btn btn-primary" data-bs-dismiss="modal">
                                     <i class="fas fa-xmark fa-fw"></i>
                                     Close Window
