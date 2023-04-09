@@ -150,10 +150,11 @@
                     <div class="portfolio-item mx-auto" data-bs-toggle="modal" data-bs-target="#portfolioModal7">
                         <div
                             class="portfolio-item-caption d-flex align-items-center justify-content-center h-100 w-100">
-                            <div class="portfolio-item-caption-content text-center text-white"><i
-                                    class="fas fa-plus fa-3x"></i></div>
+                            <div class="portfolio-item-caption-content text-center text-white text-uppercase"
+                                style='font-size:36px;'>
+                                Kalman Filter</div>
                         </div>
-                        <img class="img-fluid" src="assets/img/portfolio/comingsoom.jpg" alt="..." />
+                        <img class="img-fluid" src="assets/img/portfolio/sunset.jpg" alt="..." />
                     </div>
                 </div>
                 <!-- Portfolio Item 8-->
@@ -161,10 +162,10 @@
                     <div class="portfolio-item mx-auto" data-bs-toggle="modal" data-bs-target="#portfolioModal8">
                         <div
                             class="portfolio-item-caption d-flex align-items-center justify-content-center h-100 w-100">
-                            <div class="portfolio-item-caption-content text-center text-white"><i
-                                    class="fas fa-plus fa-3x"></i></div>
+                            <div class="portfolio-item-caption-content text-center text-white" style='font-size:36px;'>
+                                STUNTS</div>
                         </div>
-                        <img class="img-fluid" src="assets/img/portfolio/comingsoom.jpg" alt="..." />
+                        <img class="img-fluid" src="assets/img/portfolio/racecar.jpg" alt="..." />
                     </div>
                 </div>
                 <!-- Portfolio Item 9-->
@@ -296,7 +297,7 @@
             <div class="row justify-content-center">
                 <div class="col-lg-4">
                     <div class="d-flex flex-column align-items-center">
-                        <div class="icon-contact mb-3"><i class="fas fa-mobile-alt" style='font-size:36px'></i></div>
+                        <div class="icon-contact mb-3"><i class="fas fa-mobile-alt" style=' font-size:36px'></i></div>
                         <div class="text-muted">Phone</div>
                         <div class="lead font-weight-bold">(607) 601-0658</div>
                     </div>
@@ -1363,7 +1364,7 @@
                             <div class="col-lg-8">
                                 <!-- Portfolio Modal - Title-->
                                 <h2 class="portfolio-modal-title text-secondary text-uppercase mb-0">Lab 7
-                                    <h1 class="text-warning" style='margin-top: .5rem'>Time of Flight Sensors</h1>
+                                    <h1 class="text-warning" style='margin-top: .5rem'>Kalman Filter</h1>
                                 </h2>
                                 <!-- Icon Divider-->
                                 <div class="divider-custom">
@@ -1375,32 +1376,141 @@
                                 <!-- <img class="img-fluid rounded mb-5" src="assets/img/portfolio/cabin.png" alt="..." /> -->
                                 <!-- Portfolio Modal - Text-->
                                 <p align="left" class="mb-4 lead">
-
+                                    We want to drive our robot as fast as possible towards the wall and stop as close as
+                                    possible. In order to do that we need real time distance reading. However our ToF
+                                    sensor is slow. In this lab, we supplement the sensor by using a Kalman filter to
+                                    estimate the distance from the wall.
                                 </p>
-                                <h3 class="text-secondary">Setup</h3>
+                                <h3 class="text-secondary">Model</h3>
                                 <p align="left" class="mb-4 lead">
-
+                                    We first estimate the drag and momentum for the state space model by using a step
+                                    response. I drove the car towards the wall at a speed of 80 and got the following
+                                    results.
                                 </p>
-
-                                <h3 class="text-secondary">Example: Blink</h3>
+                                <h4 class="text-secondary">Run 1</h4>
+                                <img class="img-fluid img-centered" src="assets/img/portfolio/kfdm-run1.png"
+                                    onClick="swap(this)" onmouseover="" style="cursor: pointer;">
                                 <p align="left" class="mb-4 lead">
+                                    I tried to estimate velocity by integrating acceleration from the IMU but the
+                                    results
+                                    are not that great. <br>
+                                    From the graph and data we can say that steady state speed = <code>907 mm/s</code>
+                                    and 90% rise time =
+                                    <code>1278 ms</code>. Then we can calculate drag and mass: <br>
+                                    d = u/x_dot, let u =1, d = 1/907 = 0.0011 <br>
+                                    m = -d * t_0.9 / ln (1-0.9) = 0.0011*1.278 / ln(0.1) = 0.0006105
                                 </p>
-                                <iframe width="560" height="315" src="https://www.youtube.com/embed/rHggYrlvzK8"
-                                    title="YouTube video player" frameborder="0"
+                                <h4 class="text-secondary">Run 2</h4>
+                                <img class="img-fluid img-centered" src="assets/img/portfolio/kfdm-run2.png"
+                                    onClick="swap(this)" onmouseover="" style="cursor: pointer;">
+                                <p align="left" class="mb-4 lead">
+                                    Repeating the same process in Run 1 we get <br>
+                                    Steady state speed = 672 mm/s <br>
+                                    90% rise time = 1s <br>
+                                    d = 0.0015 <br>
+                                    m = 0.0006514417229 <br>
+                                </p>
+
+                                <h3 class="text-secondary">Kalman Filter Test</h3>
+                                <p align="left" class="mb-4 lead">
+                                    As a sanity check, we run the Kalman filter with data collected from the run.
+                                    Details of the algorithm can be found in
+                                    <a href=https://cei-lab.github.io/FastRobots-2023/lectures/FastRobots-13-KF.pdf>Prof.
+                                        Kirstin Petersen’s awesome lecture</a>.
+                                    <br>
+                                    With drag and mass we can construct our A and B matrices and discretize them:<br>
+                                    <code>A = np.array([[0,1],[0,-d/m]]) <br>
+                                        B = np.array([[0],[1/m]]) <br>
+                                    dt = 0.01<br>
+                                    Ad = np.eye(2) + dt * A<br>
+                                    Bd = dt * B<br></code>
+
+                                    C matrix: <br>
+                                    <code>C = np.array([[-1,0]])</code> <br>
+
+                                    We also need to specify the process noise and sensor noise:<br>
+                                    <code>sigma_1 = 100<br>
+                                        sigma_2 = 100<br>
+                                        sigma_3 = 20<br>
+                                        sig_u = np.array([[sigma_1**2,0],[0,sigma_2**2]])<br>
+                                        sig_z = np.array([[sigma_3**2]])</code><br>
+
+                                    We set our initial state to first sensor data and give a resonable initial state
+                                    uncertainty.<br>
+                                    <code>x = np.array([[-tof[0]],[0]]) <br>
+                                        sig = np.array([[5**2,0],[0,5**2]])</code>
+                                </p>
+
+                                <p align="left" class="mb-4 lead">
+                                    Then we can run our Kalman filter.
+                                </p>
+                                <script
+                                    src="https://gist.github.com/tiantianLl/ca0d1614c23cd6beb43e662d83f80cb1.js"></script>
+                                <p align="left" class="mb-4 lead">
+                                    The results are shown below. We can see that our car model is not very accurate thus
+                                    trusting the model too much did not produce good estimates. Therefore I increased
+                                    the noise of the model and the prediction better matches the sensor reading.
+                                </p>
+                                <img class="img-fluid img-centered" src="assets/img/portfolio/kf-test.png"
+                                    onClick="swap(this)" onmouseover="" style="cursor: pointer;">
+
+
+                                <h3 class="text-secondary mt-4">Kalman Filter on Artemis</h3>
+                                <p align="left" class="mb-4 lead">
+                                    Next step is to move the Kalman filter onto our robot. One difference is that we
+                                    only run the update step when there is sensor reading, otherwise only the prediction
+                                    step is runed. <br>
+                                    Here is the relevant code:
+                                </p>
+
+                                <script
+                                    src="https://gist.github.com/tiantianLl/dbe9d6c616923d8d8c21463fbde577da.js"></script>
+
+                                <p align="left" class="mb-4 lead">Data from first try:</p>
+
+                                <img class="img-fluid img-centered" src="assets/img/portfolio/kf-1.png"
+                                    onClick="swap(this)" onmouseover="" style="cursor: pointer;">
+
+                                <p align="left" class="mb-4 lead">We can see that the Kalman Filter performed badly. I
+                                    ended up using <a href=https://anyafp.github.io/ece4960/labs/lab7>Anya's drag and
+                                        mass</a> from previous year and got more reasonable results. <br>
+                                    Here are some data from the process of tuning the Kalman filter. I had to change dt
+                                    (and thus discretized A and B) since the prediction step is run much often. I also
+                                    had to adjust noise covariance matrices because now trusting the sensor too much
+                                    will make the car run into the wall.
+                                </p>
+
+                                <p align="left" class="mb-4 lead">Karlman filter too conservative, car ran into the
+                                    wall.</p>
+                                <img class="img-fluid img-centered" src="assets/img/portfolio/kf-2.png"
+                                    onClick="swap(this)" onmouseover="" style="cursor: pointer;">
+
+                                <p align="left" class="mb-4 lead">Karlman filter too aggresive, car stops too soon</p>
+                                <img class="img-fluid img-centered" src="assets/img/portfolio/kf-3.png"
+                                    onClick="swap(this)" onmouseover="" style="cursor: pointer;">
+                                <img class="img-fluid img-centered" src="assets/img/portfolio/kf-4.png"
+                                    onClick="swap(this)" onmouseover="" style="cursor: pointer;">
+
+                                <p align="left" class="mb-4 lead">Finally I found a good set of parameters and got
+                                    satisfactory results. (I only remembered to plot ToF data as dots in this plot)</p>
+                                <img class="img-fluid img-centered" src="assets/img/portfolio/kf-5.png"
+                                    onClick="swap(this)" onmouseover="" style="cursor: pointer;">
+                                <img class="img-fluid img-centered" src="assets/img/portfolio/kf-5d.png"
+                                    onClick="swap(this)" onmouseover="" style="cursor: pointer;">
+
+                                <p align="left" class="mb-4 lead">Here is a demo of the robot stopping in front of the
+                                    wall with the help of Kalman filter.</p>
+                                <iframe width="491" height="872" src="https://www.youtube.com/embed/UJ0wElGRDhc"
+                                    title="Lab7 Kalman Filter" frameborder="0"
                                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                                     allowfullscreen></iframe>
 
-                                <h3 class="text-secondary mt-4">Example: Serial</h3>
-                                <p align="left" class="mb-4 lead">
 
-                                    <img class="img-fluid img-centered" src="assets/img/portfolio/serial.png"
-                                        onClick="swap(this)" onmouseover="" style="cursor: pointer;">
-                                </p>
+                                <p align="left" class="mt-4 mb-4 lead">Other things I did during this lab:<br>
+                                    Discovered I never implemented a comp filter, but
+                                    performance got worse when I did it. Yaw would just go back to 0.<br>
+                                    Modified my PID from lab 6 to a state machine. Details are discussed in lab 8.
 
-                                <h3 class="text-secondary">Example: Analog Read</h3>
-                                <p align="left" class="mb-4 lead"></p>
-
-                                <p align="left" class="mt-4 mb-4 lead">
                                 </p>
                                 <button class="btn btn-primary" data-bs-dismiss="modal">
                                     <i class="fas fa-xmark fa-fw"></i>
@@ -1426,7 +1536,7 @@
                             <div class="col-lg-8">
                                 <!-- Portfolio Modal - Title-->
                                 <h2 class="portfolio-modal-title text-secondary text-uppercase mb-0">Lab 8
-                                    <h1 class="text-warning" style='margin-top: .5rem'>Time of Flight Sensors</h1>
+                                    <h1 class="text-warning" style='margin-top: .5rem'>Stunts</h1>
                                 </h2>
                                 <!-- Icon Divider-->
                                 <div class="divider-custom">
@@ -1438,32 +1548,42 @@
                                 <!-- <img class="img-fluid rounded mb-5" src="assets/img/portfolio/cabin.png" alt="..." /> -->
                                 <!-- Portfolio Modal - Text-->
                                 <p align="left" class="mb-4 lead">
-
+                                    In this lab, we combine what we have learned to perform fast stunts. I choose to do
+                                    Task B: drive the car fast towards the wall and turn 180 degrees. <br>
+                                    My code structure is illustrated here:
                                 </p>
-                                <h3 class="text-secondary">Setup</h3>
+                                <img class="img-fluid img-centered" src="assets/img/portfolio/stuntflow.png"
+                                    onClick="swap(this)" onmouseover="" style="cursor: pointer;">
+
+                                <script
+                                    src="https://gist.github.com/tiantianLl/58cf17ea2999b2573aff076ef48ba629.js"></script>
+
                                 <p align="left" class="mb-4 lead">
-
+                                    Here is a graph from one run:
                                 </p>
+                                <img class="img-fluid img-centered" src="assets/img/portfolio/stunt.png"
+                                    onClick="swap(this)" onmouseover="" style="cursor: pointer;">
 
-                                <h3 class="text-secondary">Example: Blink</h3>
-                                <p align="left" class="mb-4 lead">
+                                <p align="left" class="mb-4 lead">In the end the car is able to perform the stunt at a
+                                    speed of 200.
                                 </p>
-                                <iframe width="560" height="315" src="https://www.youtube.com/embed/rHggYrlvzK8"
+                                <iframe width="560" height="315" src="https://www.youtube.com/embed/XtzSp47AlXA"
                                     title="YouTube video player" frameborder="0"
                                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                                     allowfullscreen></iframe>
 
-                                <h3 class="text-secondary mt-4">Example: Serial</h3>
-                                <p align="left" class="mb-4 lead">
-
-                                    <img class="img-fluid img-centered" src="assets/img/portfolio/serial.png"
-                                        onClick="swap(this)" onmouseover="" style="cursor: pointer;">
-                                </p>
-
-                                <h3 class="text-secondary">Example: Analog Read</h3>
-                                <p align="left" class="mb-4 lead"></p>
-
                                 <p align="left" class="mt-4 mb-4 lead">
+                                    During the implementation process there are several things I ran into:
+                                    <li align="left" class="mb-2 lead">I need to set the ToF sensor to long dist mode.
+                                    </li>
+                                    <li align="left" class="mb-2 lead">My ToF is slightly facing down, the laser would
+                                        hit the ground before hitting
+                                        the wall and therefore gave inaccurate readings. I had to reposition the sensor.
+                                    </li>
+                                    <li align="left" class="mb-2 lead">I increased PWM speed for the stunt so my KF
+                                        setups need to be updated.</li>
+                                    <li align="left" class="mb-2 lead">I increased the IMU sample rate for better
+                                        orientational PID control.</li>
                                 </p>
                                 <button class="btn btn-primary" data-bs-dismiss="modal">
                                     <i class="fas fa-xmark fa-fw"></i>
