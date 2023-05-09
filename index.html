@@ -173,10 +173,10 @@
                     <div class="portfolio-item mx-auto" data-bs-toggle="modal" data-bs-target="#portfolioModal9">
                         <div
                             class="portfolio-item-caption d-flex align-items-center justify-content-center h-100 w-100">
-                            <div class="portfolio-item-caption-content text-center text-white"><i
-                                    class="fas fa-plus fa-3x"></i></div>
+                            <div class="portfolio-item-caption-content text-center text-white" style='font-size:36px;'>
+                                MAPPING</div>
                         </div>
-                        <img class="img-fluid" src="assets/img/portfolio/comingsoom.jpg" alt="..." />
+                        <img class="img-fluid" src="assets/img/portfolio/mapping.png" alt="..." />
                     </div>
                 </div>
                 <!-- Portfolio Item 10-->
@@ -184,10 +184,10 @@
                     <div class="portfolio-item mx-auto" data-bs-toggle="modal" data-bs-target="#portfolioModal10">
                         <div
                             class="portfolio-item-caption d-flex align-items-center justify-content-center h-100 w-100">
-                            <div class="portfolio-item-caption-content text-center text-white"><i
-                                    class="fas fa-plus fa-3x"></i></div>
+                            <div class="portfolio-item-caption-content text-center text-white" style='font-size:36px;'>
+                                LOCALIZATION (SIM)</div>
                         </div>
-                        <img class="img-fluid" src="assets/img/portfolio/comingsoom.jpg" alt="..." />
+                        <img class="img-fluid" src="assets/img/portfolio/bayes-top.png" alt="..." />
                     </div>
                 </div>
                 <!-- Portfolio Item 11-->
@@ -1608,8 +1608,8 @@
                         <div class="row justify-content-center">
                             <div class="col-lg-8">
                                 <!-- Portfolio Modal - Title-->
-                                <h2 class="portfolio-modal-title text-secondary text-uppercase mb-0">Lab 3
-                                    <h1 class="text-warning" style='margin-top: .5rem'>Time of Flight Sensors</h1>
+                                <h2 class="portfolio-modal-title text-secondary text-uppercase mb-0">Lab 9
+                                    <h1 class="text-warning" style='margin-top: .5rem'>Mapping</h1>
                                 </h2>
                                 <!-- Icon Divider-->
                                 <div class="divider-custom">
@@ -1621,33 +1621,88 @@
                                 <!-- <img class="img-fluid rounded mb-5" src="assets/img/portfolio/cabin.png" alt="..." /> -->
                                 <!-- Portfolio Modal - Text-->
                                 <p align="left" class="mb-4 lead">
-
+                                    In this lab we use our robot to map out a room. This is done by spinning the robot
+                                    360 and gathering ToF data. In order to do that I used angular speed control with a
+                                    proportional term.
                                 </p>
-                                <h3 class="text-secondary">Setup</h3>
                                 <p align="left" class="mb-4 lead">
-
+                                    To make the robot turn slowly and consistently, I implemented a PID controller that
+                                    works on the raw gyroscope angular velocity data. This is more reliable than
+                                    orientation control since now we avoid the integration error when estimating yaw.
+                                    Here is a graph showing the PID controller working. We can see the PWM input mirrors
+                                    angular velocity and the angular velocity is kept around 30 degree/s. Yaw is in a
+                                    straight line indicating constant angular velocity. Therefore, we can assume the
+                                    readings are consistently separated in angular space.
                                 </p>
+                                <img class="img-fluid img-centered" src="assets/img/portfolio/map-pid.png"
+                                    onClick="swap(this)" onmouseover="" style="cursor: pointer;">
 
-                                <h3 class="text-secondary">Example: Blink</h3>
                                 <p align="left" class="mb-4 lead">
+                                    Here is a video showing the robot rotating on axis. The slowest speed I was able to
+                                    turn was around 90. I got around 100 readings in 10s, which means each measurement
+                                    took 0.1 second. Since the average angular velocity was 30 degree/s, the orientation
+                                    of the robot changes about 0.1*30 = 3 degrees during a measurement. <br>
+                                    From the video, we can see the robot did not shift much when turning and ended up
+                                    relatively in the same place. Therefore I assume the measurements to be pretty
+                                    accurate.
+
                                 </p>
-                                <iframe width="560" height="315" src="https://www.youtube.com/embed/rHggYrlvzK8"
+                                <iframe width="560" height="315" src="https://www.youtube.com/embed/TGuaJsP70Pk"
                                     title="YouTube video player" frameborder="0"
                                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                                     allowfullscreen></iframe>
 
-                                <h3 class="text-secondary mt-4">Example: Serial</h3>
+                                <h3 class="text-secondary">Gathering Data</h3>
                                 <p align="left" class="mb-4 lead">
+                                    To map the entire room, my robot executes 360 turns at 4 marked positions and sends
+                                    back data to the computer via bluetooth. For the orientation, I trust the gyroscope
+                                    values more. However, I realized I was not recording IMU and ToF readings at the
+                                    same time. Although I can try to extrapolate, I found the results satisfactory when
+                                    assuming that the readings are spaced equally in angular space. <br>
 
-                                    <img class="img-fluid img-centered" src="assets/img/portfolio/serial.png"
-                                        onClick="swap(this)" onmouseover="" style="cursor: pointer;">
+                                    Here are the data collected and the polar coordinates plots generated for each scan:
+
+                                </p>
+                                <img class="img-fluid img-centered" src="assets/img/portfolio/scans.jpeg"
+                                    onClick="swap(this)" onmouseover="" style="cursor: pointer;">
+                                <img class="img-fluid img-centered" src="assets/img/portfolio/00scan.png"
+                                    onClick="swap(this)" onmouseover="" style="cursor: pointer;">
+
+
+
+                                <p align="left" class="mb-4 lead">
+                                    The measurements are what I expected and match the real room. I scanned twice at
+                                    position (0,0). The results are not super precise and are offset by a slight
+                                    rotation.
                                 </p>
 
-                                <h3 class="text-secondary">Example: Analog Read</h3>
-                                <p align="left" class="mb-4 lead"></p>
+                                <h3 class="text-secondary">Map</h3>
+                                <p align="left" class="mb-4 lead">
+                                    The final step is to merge everything together and generate the whole map. I did not
+                                    start my robot in the same orientation in all scans. Luckily this is easy to work
+                                    with using transformation matrices. <br>
+                                    First we data from polar to cartesian coordinates.
+                                    Then we use the transformation matrix to map points from the robot frame to the
+                                    global frame.
 
-                                <p align="left" class="mt-4 mb-4 lead">
                                 </p>
+                                <script
+                                    src="https://gist.github.com/tiantianLl/cf8ff2bce8bbaba25f56af80741452e1.js"></script>
+
+                                <p align="left" class="mb-4 lead">The final result looks like this:</p>
+                                <img class="img-fluid img-centered" src="assets/img/portfolio/map-final.png"
+                                    onClick="swap(this)" onmouseover="" style="cursor: pointer;">
+
+                                <p align="left" class="mb-4 lead">And we manually estimate the walls and obstacles. <br>
+                                    <code>final_x = np.array([-1500, -1500, -600, -600, 1900, 1900, 300 , 300, -250, -250, -1500])</code>
+                                    <br>
+                                    <code>final_y = np.array([-1250, 400, 400, 1500, 1500, -1250, -1250, -750, -750, -1250, -1250])</code>
+                                </p>
+                                <img class="img-fluid img-centered" src="assets/img/portfolio/map-final-overlay.png"
+                                    onClick="swap(this)" onmouseover="" style="cursor: pointer;">
+
+
+
                                 <button class="btn btn-primary" data-bs-dismiss="modal">
                                     <i class="fas fa-xmark fa-fw"></i>
                                     Close Window
@@ -1671,8 +1726,9 @@
                         <div class="row justify-content-center">
                             <div class="col-lg-8">
                                 <!-- Portfolio Modal - Title-->
-                                <h2 class="portfolio-modal-title text-secondary text-uppercase mb-0">Lab 3
-                                    <h1 class="text-warning" style='margin-top: .5rem'>Time of Flight Sensors</h1>
+                                <h2 class="portfolio-modal-title text-secondary text-uppercase mb-0">Lab 10
+                                    <h1 class="text-warning" style='margin-top: .5rem'>Grid Localization using Bayes
+                                        Filter</h1>
                                 </h2>
                                 <!-- Icon Divider-->
                                 <div class="divider-custom">
@@ -1684,34 +1740,87 @@
                                 <!-- <img class="img-fluid rounded mb-5" src="assets/img/portfolio/cabin.png" alt="..." /> -->
                                 <!-- Portfolio Modal - Text-->
                                 <p align="left" class="mb-4 lead">
-
+                                    In this lab we implemented a Bayes Filter to perform grid localization in the
+                                    simulator. Bayes Filter uses the notion of a belief which is recursively predicted
+                                    with a motion model and updated with sensor inputs. The algorithm <a
+                                        href=https://cei-lab.github.io/FastRobots-2023/lectures/FastRobots-16-Markov_BayesFilter1.pdf>[Professor
+                                        Petersen's great lecture]</a> works as follows:
                                 </p>
-                                <h3 class="text-secondary">Setup</h3>
+                                <img class="img-fluid img-centered" src="assets/img/portfolio/bayes.png"
+                                    onClick="swap(this)" onmouseover="" style="cursor: pointer;">
+
+                                <p align="left" class="mb-4 lead">With the help of predefined classes and helper
+                                    functions we complete the filter in the following steps:</p>
+
+
+
+                                <h3 class="text-secondary">compute_control</h3>
+                                <p align="left" class="mb-4 lead">
+                                    The compute_control function takes in the previous and current state, and then
+                                    extracts the action taken from the changes in states. In our setting we can figure
+                                    out the translation and the rotations before and after translation, given previous
+                                    and current poses of the robots.
+                                </p>
+                                <script
+                                    src="https://gist.github.com/tiantianLl/e12bdc4fe3d50e17a8494fae3fe3b6a3.js"></script>
+
+                                <h3 class="text-secondary">odom_motion_model</h3>
+                                <p align="left" class="mb-4 lead">
+                                    The odom_motion_model function calculates the transition probabilities. The
+                                    probability of the robot actually taking action rot1, trans, rot2 (and thus end up
+                                    in state cur_pose) given that the control input is u can be modeled with Gaussian
+                                    distribution.
+                                </p>
+                                <script
+                                    src="https://gist.github.com/tiantianLl/e92d7d3ee0b761f46cae26dc5f2e480c.js"></script>
+
+
+                                <h3 class="text-secondary mt-4">prediction_step</h3>
                                 <p align="left" class="mb-4 lead">
 
+                                    After taking an action, the prediction step makes predictions based on previous
+                                    belief and the motion model. The probability that the robot is in state x is equal
+                                    to the sum of {probability that the robot was in state x’ times the probability that
+                                    the robot will end up in x given the robot was in state x’ and took the action}. For
+                                    efficiency we skip those states with previous belief smaller than 0.0001. This can
+                                    lead to total probability not summing to 1 anymore. Thus we normalize the belief in
+                                    the end.
                                 </p>
+                                <script
+                                    src="https://gist.github.com/tiantianLl/b58605a15b814a27c7d9cf5955338677.js"></script>
 
-                                <h3 class="text-secondary">Example: Blink</h3>
+                                <h3 class="text-secondary">sensor_model</h3>
+                                <p align="left" class="mb-4 lead">The sensor_model function takes in the true
+                                    observation of the environment and outputs the probability that the current sensor
+                                    measurements are obtained at each state. This can again be modeled by a gaussian
+                                    distribution.</p>
+                                <script
+                                    src="https://gist.github.com/tiantianLl/1aa116a724508eec4ee7180a0ca7830f.js"></script>
+
+
+                                <h3 class="text-secondary">update_step</h3>
                                 <p align="left" class="mb-4 lead">
+                                    The update_step updates the belief base on the sensor model. The new belief is
+                                    updated based on how much sense the prior belief makes given the sensor
+                                    measurements.
                                 </p>
-                                <iframe width="560" height="315" src="https://www.youtube.com/embed/rHggYrlvzK8"
+                                <script
+                                    src="https://gist.github.com/tiantianLl/1b6a27e04677af454ac943079846a25e.js"></script>
+
+                                <h3 class="text-secondary">Running Bayes</h3>
+                                <p align="left" class="mb-4 lead">Here are demos showing the bayes filter running. The
+                                    green line shows the ground truth, the red line is the odometry readings, and the
+                                    blue line is Bayes filter outputs. We can see that the Bayes filter gave pretty
+                                    accurate estimates even though the odometry readings are very off.</p>
+                                <img class="img-fluid img-centered" src="assets/img/portfolio/bayes_sim.png"
+                                    onClick="swap(this)" onmouseover="" style="cursor: pointer;">
+
+                                <iframe width="560" height="315" src="https://www.youtube.com/embed/Snv9NcWdTdE"
                                     title="YouTube video player" frameborder="0"
                                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                                     allowfullscreen></iframe>
 
-                                <h3 class="text-secondary mt-4">Example: Serial</h3>
-                                <p align="left" class="mb-4 lead">
-
-                                    <img class="img-fluid img-centered" src="assets/img/portfolio/serial.png"
-                                        onClick="swap(this)" onmouseover="" style="cursor: pointer;">
-                                </p>
-
-                                <h3 class="text-secondary">Example: Analog Read</h3>
-                                <p align="left" class="mb-4 lead"></p>
-
-                                <p align="left" class="mt-4 mb-4 lead">
-                                </p>
-                                <button class="btn btn-primary" data-bs-dismiss="modal">
+                                <button class="mt-4 btn btn-primary" data-bs-dismiss="modal">
                                     <i class="fas fa-xmark fa-fw"></i>
                                     Close Window
                                 </button>
