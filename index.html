@@ -195,10 +195,10 @@
                     <div class="portfolio-item mx-auto" data-bs-toggle="modal" data-bs-target="#portfolioModal11">
                         <div
                             class="portfolio-item-caption d-flex align-items-center justify-content-center h-100 w-100">
-                            <div class="portfolio-item-caption-content text-center text-white"><i
-                                    class="fas fa-plus fa-3x"></i></div>
+                            <div class="portfolio-item-caption-content text-center text-white" style='font-size:36px;'>
+                                LOCALIZATION (REAL)</div>
                         </div>
-                        <img class="img-fluid" src="assets/img/portfolio/comingsoom.jpg" alt="..." />
+                        <img class="img-fluid" src="assets/img/portfolio/car-loc.jpg" alt="..." />
                     </div>
                 </div>
                 <!-- Portfolio Item 12-->
@@ -229,7 +229,7 @@
                         <div
                             class="portfolio-item-caption d-flex align-items-center justify-content-center h-100 w-100">
                             <div class="portfolio-item-caption-content text-center text-white" style='font-size:36px;'>
-                                Reflection</div>
+                                REFLECTION</div>
                         </div>
                         <img class="img-fluid" src="assets/img/portfolio/the-thinker.jpg" alt="..." />
                     </div>
@@ -1844,7 +1844,8 @@
                             <div class="col-lg-8">
                                 <!-- Portfolio Modal - Title-->
                                 <h2 class="portfolio-modal-title text-secondary text-uppercase mb-0">Lab 11
-                                    <h1 class="text-warning" style='margin-top: .5rem'>Time of Flight Sensors</h1>
+                                    <h1 class="text-warning" style='margin-top: .5rem'>Localization on the real robot
+                                    </h1>
                                 </h2>
                                 <!-- Icon Divider-->
                                 <div class="divider-custom">
@@ -1856,32 +1857,76 @@
                                 <!-- <img class="img-fluid rounded mb-5" src="assets/img/portfolio/cabin.png" alt="..." /> -->
                                 <!-- Portfolio Modal - Text-->
                                 <p align="left" class="mb-4 lead">
-
+                                    Building on the previous lab, we perform localization with the Bayes filter on the
+                                    actual robot in this lab. I collaborated with Jueun Kwon for this lab.
                                 </p>
                                 <h3 class="text-secondary">Setup</h3>
                                 <p align="left" class="mb-4 lead">
-
+                                    We first verify the localization part of the starter code in the simulator. Here is
+                                    the result. We can see that the Bayes filter (blue) works well just like the last
+                                    lab.
                                 </p>
+                                <img class="img-fluid img-centered" src="assets/img/portfolio/loc_sim.png"
+                                    onClick="swap(this)" onmouseover="" style="cursor: pointer;">
 
-                                <h3 class="text-secondary">Example: Blink</h3>
+                                <h3 class="text-secondary">perform_observation_loop</h3>
                                 <p align="left" class="mb-4 lead">
-                                </p>
-                                <iframe width="560" height="315" src="https://www.youtube.com/embed/rHggYrlvzK8"
-                                    title="YouTube video player" frameborder="0"
-                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                                    allowfullscreen></iframe>
+                                    This function tells the robot to rotate 360 and collect sensor measurement data. The
+                                    code that runs on the Artemis performs PID angular speed control just like in Lab 9.
+                                    We changed the <code>observation_count</code> in <code>world.yaml</code> to collect
+                                    71 readings and also calculated sensor bearings based on dt and angular velocity.
+                                    Here is our implementation.
 
-                                <h3 class="text-secondary mt-4">Example: Serial</h3>
+                                </p>
+                                <script
+                                    src="https://gist.github.com/tiantianLl/9ab89d2fb27f06b94cb382a5b64a800c.js"></script>
+                                <p align="left" class="mb-4 lead">We were confused by the get_pose() function in the
+                                    beginning, but that does not need to be implemented.</p>
+
+
+                                <h3 class="text-secondary mt-4">Results</h3>
                                 <p align="left" class="mb-4 lead">
-
-                                    <img class="img-fluid img-centered" src="assets/img/portfolio/serial.png"
-                                        onClick="swap(this)" onmouseover="" style="cursor: pointer;">
+                                    We placed our robot at marked poses in the lab and ran an update step of the Bayes
+                                    filter. Here are the results:
                                 </p>
+                                <h4 class="text-secondary">(-3 ft, -2ft, 0 deg)</h4>
+                                <img class="img-fluid img-centered" src="assets/img/portfolio/bl_map.PNG"
+                                    onClick="swap(this)" onmouseover="" style="cursor: pointer;">
+                                <img class="img-fluid img-centered" src="assets/img/portfolio/bl_loc.PNG"
+                                    onClick="swap(this)" onmouseover="" style="cursor: pointer;">
 
-                                <h3 class="text-secondary">Example: Analog Read</h3>
-                                <p align="left" class="mb-4 lead"></p>
+
+
+                                <h4 class="text-secondary mt-4">(0 ft, 3 ft, 0 deg)</h4>
+                                <img class="img-fluid img-centered" src="assets/img/portfolio/tm_map.PNG"
+                                    onClick="swap(this)" onmouseover="" style="cursor: pointer;">
+                                <img class="img-fluid img-centered" src="assets/img/portfolio/tm_loc.PNG"
+                                    onClick="swap(this)" onmouseover="" style="cursor: pointer;">
+
+
+
+                                <h4 class="text-secondary mt-4">(5 ft, -3 ft, 0 deg)</h4>
+                                <img class="img-fluid img-centered" src="assets/img/portfolio/br_map.PNG"
+                                    onClick="swap(this)" onmouseover="" style="cursor: pointer;">
+                                <img class="img-fluid img-centered" src="assets/img/portfolio/br_loc.PNG"
+                                    onClick="swap(this)" onmouseover="" style="cursor: pointer;">
+
+                                <h4 class="text-secondary mt-4">(5 ft, 3 ft, 0 deg)</h4>
+                                <img class="img-fluid img-centered" src="assets/img/portfolio/tr_map.PNG"
+                                    onClick="swap(this)" onmouseover="" style="cursor: pointer;">
+                                <img class="img-fluid img-centered" src="assets/img/portfolio/tr_loc.PNG"
+                                    onClick="swap(this)" onmouseover="" style="cursor: pointer;">
+
+
+
 
                                 <p align="left" class="mt-4 mb-4 lead">
+                                    As we can see, the localization poses are all the same or within one grid square of
+                                    the ground truth. Possible reasons for inaccuracies might include the robot not
+                                    turning exactly in place, giving slightly off ToF readings, and confusing the
+                                    localization. The robot localizes better at the bottom two positions. Maybe the
+                                    bottom two locations have more unique features. On the contrary, I can imagine
+                                    moving around the top right corner pose can give similar observations.
                                 </p>
                                 <button class="btn btn-primary" data-bs-dismiss="modal">
                                     <i class="fas fa-xmark fa-fw"></i>
